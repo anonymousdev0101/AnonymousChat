@@ -41,11 +41,9 @@ def main():
             st.session_state.username = username  # Save username in session state
             st.session_state.messages = read_chat_history()  # Reload chat history from the file
             st.success(f"Username set to: {username}. You can now start chatting!")
-
-            # Hide the username input and show the chat interface
-            st.experimental_rerun()  # This will force the app to reload and show the chat
-
-        return  # Stop execution here until a username is chosen
+            
+            # Don't rerun the app, just continue to the next steps
+            return
 
     # Show chat interface after username is set
     st.title(f"Chat as {st.session_state.username}")
@@ -57,8 +55,7 @@ def main():
     new_message = st.text_input("Your message:", key="message_input")
 
     # Display "Sent as: username" text
-    if st.session_state.username:
-        st.text(f"Sent as: {st.session_state.username}")
+    st.text(f"Sent as: {st.session_state.username}")
 
     # Send button
     if st.button("Send"):
@@ -70,18 +67,11 @@ def main():
             st.warning("Please enter a message before sending.")
 
     # Display the chat history (updating it every few seconds)
-    while True:
-        # Update the chat display every 2 seconds
-        chat_history = "\n".join(st.session_state.messages)
-        
-        # Create a unique key for each iteration
-        chat_placeholder.text_area("Chat", value=chat_history, height=300, max_chars=None, key=f"chat_area_{time.time()}", disabled=True)
+    chat_history = "\n".join(st.session_state.messages)
+    chat_placeholder.text_area("Chat", value=chat_history, height=300, max_chars=None, key="chat_area", disabled=True)
 
-        # Refresh the chat messages
-        st.session_state.messages = read_chat_history()
-
-        # Simulate a delay (e.g., polling every 2 seconds for new messages)
-        time.sleep(2)
+    # Refresh the chat messages in real-time (checking for updates every 2 seconds)
+    time.sleep(2)
 
 if __name__ == "__main__":
     main()
