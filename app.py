@@ -1,51 +1,46 @@
 import streamlit as st
-import os
-import time
-import random
-import string
+from datetime import datetime
 
-# Directory to save chat history files
-CHAT_HISTORY_DIR = 'chat_history'
+# Define the file where the chat history will be stored
+CHAT_HISTORY_FILE = 'data.txt'
 
-# Ensure the chat history directory exists
-if not os.path.exists(CHAT_HISTORY_DIR):
-    os.makedirs(CHAT_HISTORY_DIR)
+# Function to read chat history (up to 100 most recent messages)
+def read_chat_history():
+    try:
+        with open(CHAT_HISTORY_FILE, 'r', encoding='utf-8') as f:
+            chat_history = f.readlines()
+        return chat_history[-100:]  # Return only the last 100 messages
+    except FileNotFoundError:
+        # If the file doesn't exist, return an empty list
+        return []
 
-# Function to generate a unique file name based on current timestamp and random string
-def generate_unique_filename():
-    timestamp = time.strftime("%Y%m%d-%H%M%S")  # Time-based unique ID
-    random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=5))
-    return f"{timestamp}_{random_suffix}.txt"
-
-# Function to save the chat message to a unique file
-def save_message_to_file(message):
-    filename = generate_unique_filename()
-    file_path = os.path.join(CHAT_HISTORY_DIR, filename)
+# Function to save a new message to the chat history file
+def save_message(message):
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    new_message = f"{current_time} - {message}\n"
     
-    # Add the message to the file
-    with open(file_path, 'w') as file:
-        file.write(message)
+    # Append the new message to the file
+    with open(CHAT_HISTORY_FILE, 'a', encoding='utf-8') as f:
+        f.write(new_message)
 
-# Streamlit interface for the chat
+# Streamlit App Interface
 def main():
     st.title("Anonymous Chat")
 
-    # Display instructions
-    st.write("Welcome to the anonymous chat. Type your message and hit send!")
+    # Display previous chat history (last 100 messages)
+    st.subheader("Chat History")
+    chat_history = read_chat_history()
+    for message in chat_history:
+        st.write(message.strip())  # Remove newline character at the end of each message
 
-    # Text input for user message
-    user_message = st.text_input("Your message:")
-
+    # Input box for the new message
+    new_message = st.text_input("Your message:")
     if st.button("Send"):
-        if user_message:
-            # Save the message to a unique file
-            save_message_to_file(user_message)
-            st.success("Your message has been sent!")
-            st.text_area("Chat History", user_message, height=200)
-            st.experimental_rerun()  # Rerun to clear input field and update the chat history
+        if new_message:
+            save_message(new_message)  # Save the new message to the file
+            st.experimental_rerun()  # Reload the page to display the updated chat history
         else:
             st.warning("Please enter a message before sending.")
 
 if __name__ == "__main__":
     main()
-
