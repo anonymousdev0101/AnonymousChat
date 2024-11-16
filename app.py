@@ -25,12 +25,15 @@ def save_message(message):
 
 # Streamlit App Interface
 def main():
+    # Use Streamlit session state to keep track of messages and trigger re-runs
+    if 'messages' not in st.session_state:
+        st.session_state.messages = read_chat_history()  # Load the previous messages
+
     st.title("Anonymous Chat")
 
     # Display previous chat history (last 100 messages)
     st.subheader("Chat History")
-    chat_history = read_chat_history()
-    for message in chat_history:
+    for message in st.session_state.messages:
         st.write(message.strip())  # Remove newline character at the end of each message
 
     # Input box for the new message
@@ -38,7 +41,8 @@ def main():
     if st.button("Send"):
         if new_message:
             save_message(new_message)  # Save the new message to the file
-            st.experimental_rerun()  # Reload the page to display the updated chat history
+            st.session_state.messages = read_chat_history()  # Reload chat history
+            st.success("Your message has been sent!")
         else:
             st.warning("Please enter a message before sending.")
 
