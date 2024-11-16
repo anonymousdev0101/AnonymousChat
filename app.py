@@ -52,7 +52,7 @@ def main():
 
     # Simulate real-time update (poll every 1 second)
     time.sleep(1)  # Delay to simulate "real-time" chat updates
-    st.experimental_rerun()  # Re-run to refresh the chat
+    st.rerun()  # Re-run to refresh the chat
 
 if __name__ == "__main__":
     main()
