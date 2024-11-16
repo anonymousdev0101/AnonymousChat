@@ -25,17 +25,21 @@ def save_message(message):
 
 # Streamlit App Interface
 def main():
+    # Initialize session state if it doesn't exist
+    if 'messages' not in st.session_state:
+        st.session_state.messages = read_chat_history()
+
     # Title of the chat application
     st.title("Anonymous Real-Time Chat")
 
     # Display previous chat history (last 100 messages)
     st.subheader("Chat History")
-    chat_history = read_chat_history()
-    
+    chat_history = st.session_state.messages
+
     # Display chat history in a text area (readonly)
     chat_display = "\n".join(chat_history)
-    chat_area = st.text_area("Chat", value=chat_display, height=300, max_chars=None, key="chat_area", disabled=True)
-    
+    st.text_area("Chat", value=chat_display, height=300, max_chars=None, key="chat_area", disabled=True)
+
     # Input box for the new message
     new_message = st.text_input("Your message:")
     
@@ -43,8 +47,8 @@ def main():
     if st.button("Send"):
         if new_message:
             save_message(new_message)  # Save the new message to the file
+            st.session_state.messages = read_chat_history()  # Reload chat history from the file
             st.success("Your message has been sent!")
-            st.experimental_rerun()  # Refresh the app to display the new message in the chat history
         else:
             st.warning("Please enter a message before sending.")
 
