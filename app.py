@@ -50,6 +50,10 @@ def main():
     # Input box for the new message
     new_message = st.text_input("Your message:", key="message_input")
 
+    # Display "Sent as: username" text
+    if st.session_state.username:
+        st.text(f"Sent as: {st.session_state.username}")
+
     # Send button
     if st.button("Send"):
         if new_message:
