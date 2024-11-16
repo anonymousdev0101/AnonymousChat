@@ -52,9 +52,8 @@ def main():
         else:
             st.warning("Please enter a message before sending.")
 
-    # Simulate real-time update (poll every 1 second)
-    time.sleep(1)
-    st.experimental_rerun()  # This will trigger the app to re-run and show the latest messages
+    # Add a sleep time to simulate a real-time experience
+    time.sleep(1)  # Delay to simulate "real-time" chat updates
 
 if __name__ == "__main__":
     main()
