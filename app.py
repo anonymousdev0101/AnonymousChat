@@ -15,9 +15,9 @@ def read_chat_history():
         return []
 
 # Function to save a new message to the chat history file
-def save_message(username, message):
+def save_message(message):
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    new_message = f"{current_time} - {username}: {message}\n"
+    new_message = f"{current_time}: {message}\n"
     
     # Append the new message to the file
     with open(CHAT_HISTORY_FILE, 'a', encoding='utf-8') as f:
@@ -25,42 +25,28 @@ def save_message(username, message):
 
 # Streamlit App Interface
 def main():
-    # Check if the username has been set already in session state
-    if 'username' not in st.session_state:
-        st.session_state.username = None  # Set initial value to None
+    # Title of the chat application
+    st.title("Anonymous Real-Time Chat")
+
+    # Display previous chat history (last 100 messages)
+    st.subheader("Chat History")
+    chat_history = read_chat_history()
     
-    # If username is not set, ask the user to enter it
-    if st.session_state.username is None:
-        st.session_state.username = st.text_input("Enter your username:")
-        
-        if st.session_state.username:  # Once username is entered, proceed to the chat
-            st.session_state.username_entered = True
-            st.experimental_rerun()  # Reload the app to show the chat interface
+    # Display chat history in a text area (readonly)
+    chat_display = "\n".join(chat_history)
+    chat_area = st.text_area("Chat", value=chat_display, height=300, max_chars=None, key="chat_area", disabled=True)
+    
+    # Input box for the new message
+    new_message = st.text_input("Your message:")
+    
+    # Send button
+    if st.button("Send"):
+        if new_message:
+            save_message(new_message)  # Save the new message to the file
+            st.success("Your message has been sent!")
+            st.experimental_rerun()  # Refresh the app to display the new message in the chat history
         else:
-            st.warning("Please enter a username to start chatting.")
-            return
-
-    # If username is entered, show the chat interface
-    if st.session_state.username:
-        st.title(f"Welcome, {st.session_state.username}!")
-        
-        # Display previous chat history (last 100 messages)
-        st.subheader("Chat History")
-        chat_history = read_chat_history()
-        for message in chat_history:
-            st.write(message.strip())  # Remove newline character at the end of each message
-
-        # Input box for the new message
-        new_message = st.text_input(f"Your message, {st.session_state.username}:")
-
-        # Send button
-        if st.button("Send"):
-            if new_message:
-                save_message(st.session_state.username, new_message)  # Save the new message to the file
-                st.success("Your message has been sent!")
-                st.experimental_rerun()  # Refresh the app to display the new message in the chat history
-            else:
-                st.warning("Please enter a message before sending.")
+            st.warning("Please enter a message before sending.")
 
 if __name__ == "__main__":
     main()
