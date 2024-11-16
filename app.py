@@ -52,7 +52,9 @@ def main():
     while True:
         # Update the chat display every 2 seconds
         chat_history = "\n".join(st.session_state.messages)
-        chat_placeholder.text_area("Chat", value=chat_history, height=300, max_chars=None, key="chat_area", disabled=True)
+        
+        # Create a unique key for each iteration
+        chat_placeholder.text_area("Chat", value=chat_history, height=300, max_chars=None, key=f"chat_area_{time.time()}", disabled=True)
 
         # Refresh the chat messages
         st.session_state.messages = read_chat_history()
