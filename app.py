@@ -36,14 +36,16 @@ def main():
         st.title("Welcome to Anonymous Real-Time Chat")
         username = st.text_input("Enter a username to start chatting:", key="username_input")
         
-        # If the username is entered, save it and hide the username input
-        if username:
-            st.session_state.username = username  # Save username in session state
-            st.session_state.messages = read_chat_history()  # Reload chat history from the file
-            st.success(f"Username set to: {username}. You can now start chatting!")
+        # Set button to save the username
+        if st.button("Set Username"):
+            if username:
+                st.session_state.username = username  # Save username in session state
+                st.session_state.messages = read_chat_history()  # Reload chat history from the file
+                st.success(f"Username set to: {username}. You can now start chatting!")
+            else:
+                st.warning("Please enter a username before setting it.")
             
-            # Don't rerun the app, just continue to the next steps
-            return
+            return  # Prevent showing chat if the username isn't set yet
 
     # Show chat interface after username is set
     st.title(f"Chat as {st.session_state.username}")
