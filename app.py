@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import datetime
+import time
 
 # Define the file where the chat history will be stored
 CHAT_HISTORY_FILE = 'data.txt'
@@ -32,17 +33,16 @@ def main():
     # Title of the chat application
     st.title("Anonymous Real-Time Chat")
 
-    # Display previous chat history (last 100 messages)
-    st.subheader("Chat History")
-    chat_history = st.session_state.messages
-
-    # Display chat history in a text area (readonly)
-    chat_display = "\n".join(chat_history)
-    st.text_area("Chat", value=chat_display, height=300, max_chars=None, key="chat_area", disabled=True)
+    # Create a placeholder for the chat display that can be dynamically updated
+    chat_placeholder = st.empty()
 
     # Input box for the new message
     new_message = st.text_input("Your message:")
-    
+
+    # Display previous chat history (last 100 messages) in real-time
+    chat_history = "\n".join(st.session_state.messages)
+    chat_placeholder.text_area("Chat", value=chat_history, height=300, max_chars=None, key="chat_area", disabled=True)
+
     # Send button
     if st.button("Send"):
         if new_message:
@@ -51,6 +51,10 @@ def main():
             st.success("Your message has been sent!")
         else:
             st.warning("Please enter a message before sending.")
+
+    # Simulate real-time update (poll every 1 second)
+    time.sleep(1)
+    st.experimental_rerun()  # This will trigger the app to re-run and show the latest messages
 
 if __name__ == "__main__":
     main()
