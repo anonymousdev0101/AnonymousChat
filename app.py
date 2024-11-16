@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import datetime
+import time
 
 # Define the file where the chat history will be stored
 CHAT_HISTORY_FILE = 'data.txt'
@@ -15,9 +16,9 @@ def read_chat_history():
         return []
 
 # Function to save a new message to the chat history file
-def save_message(message):
+def save_message(username, message):
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    new_message = f"{current_time} - {message}\n"
+    new_message = f"{current_time} - {username}: {message}\n"
     
     # Append the new message to the file
     with open(CHAT_HISTORY_FILE, 'a', encoding='utf-8') as f:
@@ -25,26 +26,36 @@ def save_message(message):
 
 # Streamlit App Interface
 def main():
-    # Use Streamlit session state to keep track of messages and trigger re-runs
-    if 'messages' not in st.session_state:
-        st.session_state.messages = read_chat_history()  # Load the previous messages
+    # Ensure that the username is set in session state
+    if 'username' not in st.session_state:
+        st.session_state.username = st.text_input("Enter your username:")  # Prompt for username
+
+    # If the username is not set, do not continue to chat
+    if not st.session_state.username:
+        st.warning("Please enter a username to start chatting.")
+        return
 
     st.title("Anonymous Chat")
 
     # Display previous chat history (last 100 messages)
     st.subheader("Chat History")
-    for message in st.session_state.messages:
+    chat_history = read_chat_history()
+    for message in chat_history:
         st.write(message.strip())  # Remove newline character at the end of each message
 
     # Input box for the new message
-    new_message = st.text_input("Your message:")
+    new_message = st.text_input(f"Your message, {st.session_state.username}:")
+    
     if st.button("Send"):
         if new_message:
-            save_message(new_message)  # Save the new message to the file
+            save_message(st.session_state.username, new_message)  # Save the new message to the file
             st.session_state.messages = read_chat_history()  # Reload chat history
             st.success("Your message has been sent!")
         else:
             st.warning("Please enter a message before sending.")
+        
+    # For real-time effect, we can periodically reload the page to show updated chat
+    st.experimental_rerun()
 
 if __name__ == "__main__":
     main()
