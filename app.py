@@ -25,12 +25,22 @@ def save_message(username, message):
 
 # Streamlit App Interface
 def main():
-    # Check if username is stored in session state
+    # Check if the username has been set already in session state
     if 'username' not in st.session_state:
-        # Ask the user to enter their username
+        st.session_state.username = None  # Set initial value to None
+    
+    # If username is not set, ask the user to enter it
+    if st.session_state.username is None:
         st.session_state.username = st.text_input("Enter your username:")
+        
+        if st.session_state.username:  # Once username is entered, proceed to the chat
+            st.session_state.username_entered = True
+            st.experimental_rerun()  # Reload the app to show the chat interface
+        else:
+            st.warning("Please enter a username to start chatting.")
+            return
 
-    # If username is entered, hide the username input and show chat interface
+    # If username is entered, show the chat interface
     if st.session_state.username:
         st.title(f"Welcome, {st.session_state.username}!")
         
@@ -51,9 +61,6 @@ def main():
                 st.experimental_rerun()  # Refresh the app to display the new message in the chat history
             else:
                 st.warning("Please enter a message before sending.")
-    else:
-        # Display a message if the username is not entered yet
-        st.warning("Please enter a username to start chatting.")
 
 if __name__ == "__main__":
     main()
