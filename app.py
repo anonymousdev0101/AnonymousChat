@@ -1,6 +1,5 @@
 import streamlit as st
 from datetime import datetime
-import time
 
 # Define the file where the chat history will be stored
 CHAT_HISTORY_FILE = 'data.txt'
@@ -26,11 +25,12 @@ def save_message(username, message):
 
 # Streamlit App Interface
 def main():
-    # Ensure that the username is set in session state
+    # Check if username is stored in session state
     if 'username' not in st.session_state:
-        st.session_state.username = st.text_input("Enter your username:")  # Prompt for username
+        # Ask the user to enter their username
+        st.session_state.username = st.text_input("Enter your username:")
 
-    # If the username is not set, do not continue to chat
+    # If username is not entered yet, show a message and don't proceed
     if not st.session_state.username:
         st.warning("Please enter a username to start chatting.")
         return
@@ -45,17 +45,15 @@ def main():
 
     # Input box for the new message
     new_message = st.text_input(f"Your message, {st.session_state.username}:")
-    
+
+    # Send button
     if st.button("Send"):
         if new_message:
             save_message(st.session_state.username, new_message)  # Save the new message to the file
-            st.session_state.messages = read_chat_history()  # Reload chat history
             st.success("Your message has been sent!")
+            st.experimental_rerun()  # Refresh the app to display the new message in the chat history
         else:
             st.warning("Please enter a message before sending.")
-        
-    # For real-time effect, we can periodically reload the page to show updated chat
-    st.experimental_rerun()
 
 if __name__ == "__main__":
     main()
