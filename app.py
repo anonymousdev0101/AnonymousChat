@@ -16,9 +16,9 @@ def read_chat_history():
         return []
 
 # Function to save a new message to the chat history file
-def save_message(message):
+def save_message(username, message):
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    new_message = f"{current_time}: {message}\n"
+    new_message = f"{current_time} - {username}: {message}\n"
     
     # Append the new message to the file
     with open(CHAT_HISTORY_FILE, 'a', encoding='utf-8') as f:
@@ -30,19 +30,30 @@ def main():
     if 'messages' not in st.session_state:
         st.session_state.messages = read_chat_history()
 
-    # Title of the chat application
-    st.title("Anonymous Real-Time Chat")
+    if 'username' not in st.session_state:  # Check if username is set
+        # Prompt user to enter a username if not already set
+        st.title("Welcome to Anonymous Real-Time Chat")
+        username = st.text_input("Enter a username to start chatting:", key="username_input")
+        
+        if username:
+            st.session_state.username = username  # Save username in session state
+            st.success(f"Username set to: {username}. You can now start chatting!")
+
+        return  # Stop execution here until a username is chosen
+    
+    # Show chat interface after username is set
+    st.title(f"Chat as {st.session_state.username}")
 
     # Display the chat messages and set up a dynamic text area
     chat_placeholder = st.empty()
 
     # Input box for the new message
-    new_message = st.text_input("Your message:")
+    new_message = st.text_input("Your message:", key="message_input")
 
     # Send button
     if st.button("Send"):
         if new_message:
-            save_message(new_message)  # Save the new message to the file
+            save_message(st.session_state.username, new_message)  # Save the new message with the username
             st.session_state.messages = read_chat_history()  # Reload chat history from the file
             st.success("Your message has been sent!")
         else:
