@@ -33,15 +33,13 @@ def main():
     # Title of the chat application
     st.title("Anonymous Real-Time Chat")
 
-    # Create a placeholder for the chat display that can be dynamically updated
+    # Display chat history in a scrollable text area
     chat_placeholder = st.empty()
+    chat_history = "\n".join(st.session_state.messages)
+    chat_placeholder.text_area("Chat", value=chat_history, height=300, max_chars=None, key="chat_area", disabled=True)
 
     # Input box for the new message
     new_message = st.text_input("Your message:")
-
-    # Display previous chat history (last 100 messages) in real-time
-    chat_history = "\n".join(st.session_state.messages)
-    chat_placeholder.text_area("Chat", value=chat_history, height=300, max_chars=None, key="chat_area", disabled=True)
 
     # Send button
     if st.button("Send"):
@@ -52,8 +50,9 @@ def main():
         else:
             st.warning("Please enter a message before sending.")
 
-    # Add a sleep time to simulate a real-time experience
+    # Simulate real-time update (poll every 1 second)
     time.sleep(1)  # Delay to simulate "real-time" chat updates
+    st.experimental_rerun()  # Re-run to refresh the chat
 
 if __name__ == "__main__":
     main()
